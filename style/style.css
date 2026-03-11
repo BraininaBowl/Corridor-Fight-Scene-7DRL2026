@@ -1,0 +1,656 @@
+html {
+	box-sizing: outline-box;
+}
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+}
+
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 100;
+	src: url("../fonts/JetBrainsMono-ExtraLight.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 400;
+	src: url("../fonts/JetBrainsMono-Regular.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: italic;
+	font-weight: 400;
+	src: url("../fonts/JetBrainsMono-Italic.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 700;
+	src: url("../fonts/JetBrainsMono-Bold.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 800;
+	src: url("../fonts/JetBrainsMono-ExtraBold.woff2") format("woff2");
+}
+
+body {
+	font-family: "JetBrains Mono";
+	font-weight: 400;
+	background-color: var(--bg);
+	font-size: 10px;
+	line-height: 1.25em;
+	color: var(--fg);
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0px;
+	overflow: hidden;
+	border-radius: 15px;
+}
+
+body,
+body * {
+	box-sizing: border-box;
+}
+
+#screen {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	/* in cinematic 2.39:1 aspect ratio! */
+	width: calc(var(--cellSize) * 36);
+	height: calc(var(--cellSize) * 15);
+	overflow: hidden;
+	perspective: 800px;
+	background-color: var(--fg);
+	color: var(--bg);
+	box-shadow: 0px 0px 20px var(--bg);
+	border-radius: 4px;
+}
+
+@supports (corner-shape: superellipse(3)) {
+	#screen {
+		border-radius: 25%;
+		corner-shape: superellipse(3);
+	}
+}
+
+#screen::after {
+	content: "";
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	background: radial-gradient(
+		circle at center,
+		color(from var(--bg) srgb r g b / 0) 25%,
+		color(from var(--bg) srgb r g b / 0.75) 200%
+	);
+	pointer-events: none;
+}
+
+.screenWorldLayer {
+	transform-style: preserve-3d;
+	transform: translateX(50vw) translateY(50vh);
+}
+
+.hideInterface, .hideInterface * {
+	opacity: 0 !important;
+	pointer-events: none !important;
+}
+
+.hideButton {
+	display: none !important;
+}
+
+.screenInterfaceLayer {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	pointer-events: none;
+}
+
+.titleContainer {
+	position: absolute;
+	top: calc(var(--cellSize) * 7.5);
+	width: 100%;
+	text-align: center;
+	font-weight: 900;
+	line-height: var(--cellSize);
+	color: var(--bg);
+}
+
+.startButton {
+	position: absolute;
+	top: calc(var(--cellSize) * 9);
+	width: 100%;
+	text-align: center;
+	color: var(--green-dim);
+	font-weight: 900;
+	cursor: pointer;
+}
+
+.startButton::after {
+	color: var(--green-dim);
+	text-decoration: underline;
+}
+
+.actionContainer {
+	position: relative;
+	top: calc(var(--cellSize) * 9);
+	margin: 0px auto;
+	animation: action 3s linear;
+	animation-fill-mode: both;
+	height: calc(var(--cellSize) * 2);
+	font-weight: 900;
+	background-color: var(--bg);
+	color: var(--yellow);
+	outline-offset: -1px;
+	pointer-events: none;
+	padding: 0 0.5rem;
+	display: flex;
+	flex-direction: row;
+	gap: 0;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 3d view transitions */
+.mapcell_actor .icon,
+.screenWorldLayer {
+	transition: transform 0.45s ease;
+}
+
+.screenWorldLayer * {
+	transform-style: preserve-3d;
+}
+
+.interfaceBarsContainer {
+	position: absolute;
+	top: var(--cellSize);
+	left: var(--cellSize);
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	align-items: flex-start;
+}
+
+.interfaceBarsContainer .container {
+	display: flex;
+	flex-direction: row;
+	height: var(--cellSize);
+	gap: var(--cellSize);
+}
+
+.interfaceBarsContainer .bar {
+	display: flex;
+	flex-direction: row;
+	height: var(--cellSize);
+	gap: 0;
+}
+
+.interfaceBarsContainer .bar .pending {
+	animation: pending 1.5s infinite;
+}
+
+.interfaceBarsContainer .bar .empty {
+	fill-opacity: 0.2;
+}
+
+.interfaceBarsContainer .healthContainer {
+	color: var(--red-dim);
+}
+
+.interfaceBarsContainer .energyContainer {
+	color: var(--blue-dim);
+}
+
+.interfaceButtonsContainer {
+	position: absolute;
+	top: var(--cellSize);
+	right: var(--cellSize);
+	display: flex;
+	flex-direction: row-reverse;
+	gap: var(--cellSize);
+	align-items: flex-end;
+}
+
+.screenInterfaceLayer .button {
+	pointer-events: auto;
+	width: calc(var(--cellSize) - 2px);
+	height: calc(var(--cellSize) - 2px);
+	background-color: var(--bg);
+	margin: 1px;
+	color: var(--fg);
+	border-radius: 4px;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.screenInterfaceLayer .label {
+	width: calc(var(--cellSize) * 3);
+	height: calc(var(--cellSize));
+	background-color: var(--bg2);
+	color: var(--fg);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.screenInterfaceLayer .buttonGroup {
+	border-radius: 4px;
+	outline: 2px solid var(--bg4);
+	background: var(--bg2);
+	outline-offset: 0px;
+	display: flex;
+	flex-direction: row;
+	gap: 0;
+	align-items: flex-start;
+}
+
+.screenInterfaceLayer .toggleButtonGroup {
+	border-radius: 4px;
+	background: var(--fg);
+	display: flex;
+	flex-direction: row;
+	gap: 0;
+	align-items: flex-start;
+}
+
+.screenInterfaceLayer .toggleButtonGroup .button {
+	width: calc(var(--cellSize) - 2px);
+	height: calc(var(--cellSize) - 2px);
+	background-color: unset;
+	margin: 1px;
+	color: var(--bg3);
+	border-radius: 4px;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.screenInterfaceLayer .toggleButtonGroup .button.active {
+	background-color: var(--bg);
+	color: var(--fg);
+	cursor: unset;
+}
+
+.screenInterfaceLayer .button:hover {
+	background: var(--green);
+	color: var(--bg);
+}
+
+.screenInterfaceLayer .endTurnButtonGroup {
+	position: absolute;
+	bottom: var(--cellSize);
+	right: var(--cellSize);
+}
+
+.interactionMenuContainer {
+	pointer-events: auto;
+	position: absolute;
+	background: var(--fg);
+	color: var(--bg);
+	border-radius: 4px;
+	outline: 2px solid var(--bg4);
+}
+
+.interactionMenuHeader {
+	background: var(--bg);
+	color: var(--fg);
+	height: var(--cellSize);
+	font-weight: 800;
+	padding: 0.5rem;
+}
+
+.interactionMenuDescription {
+	height: var(--cellSize);
+	background-color: var(--fg);
+	outline: 1px solid var(--fg2);
+	outline-offset: -1px;
+	padding: 0 0.5rem;
+	font-style: italic;
+	display: flex;
+	flex-direction: row;
+	gap: 0;
+	align-items: center;
+}
+
+.interactionMenuHealth {
+	height: var(--cellSize);
+	background-color: var(--fg);
+	outline: 1px solid var(--fg1);
+	outline-offset: -1px;
+	cursor: pointer;
+	padding: 0 0.5rem;
+	display: flex;
+	flex-direction: row;
+	gap: 0;
+	align-items: center;
+}
+
+.interactionMenuHealth .empty {
+	fill-opacity: 0.2;
+}
+
+.interactionMenuHealth svg {
+	height: calc(var(--cellSize) * 0.5);
+	width: calc(var(--cellSize) * 0.5);
+	margin: 0;
+	color: var(--red-dim);
+	margin: 0 0 0 0.05rem;
+}
+
+.interactionMenuHealth > svg:first-child {
+	margin: 0 0.2rem 0 0;
+}
+
+.interactionMenuButton {
+	height: var(--cellSize);
+	background-color: var(--fg1);
+	outline: 1px solid var(--fg2);
+	outline-offset: -1px;
+	cursor: pointer;
+	padding: 0 0.5rem;
+	display: flex;
+	flex-direction: row;
+	gap: 0;
+	align-items: center;
+}
+
+.interactionMenuButton svg {
+	height: calc(var(--cellSize) * 0.5);
+	width: calc(var(--cellSize) * 0.5);
+	margin: 0 0 0 -0.1rem;
+}
+
+.interactionMenuButton svg.energyIconSvg {
+	color: var(--blue-dim);
+}
+
+.interactionMenuButton:hover {
+	background-color: var(--green-dim);
+	outline: 1px solid var(--fg2);
+}
+
+.screenActorLayer {
+	pointer-events: none;
+}
+
+.mapcell_actor {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	width: var(--cellSize);
+	height: var(--cellSize);
+	transition: opacity 0.25s ease;
+	font-size: calc(var(--cellSize) * 0.65);
+	font-weight: 900;
+	opacity: 1;
+	transition:
+	left 0.25s ease-in,
+	top 0.25s ease-in;
+}
+
+.mapcell_actor.fling {
+	transition:
+		opacity 0.25s ease,
+		left 0.25s ease-in,
+		top 0.25s ease-in;
+}
+
+.mapcell_actor.gotHit {
+	animation: gotHit 0.4s ease-out;
+	animation-iteration-count: 1;
+}
+
+.mapcell_actor.down {
+	animation: down 2s linear;
+	animation-iteration-count: 1;
+	animation-fill-mode: both;
+}
+
+.mapcell_actor .icon {
+	transform: translateZ(var(--cellSize)) rotateX(calc(var(--viewAngle) * -1));
+}
+
+.mapcell_actor.hidden {
+	opacity: 0;
+}
+
+.cell {
+	position: absolute;
+	width: var(--cellSize);
+	height: var(--cellSize);
+	outline: 1px solid var(--fg2);
+	outline-offset: -1px;
+	background: var(--fg1);
+	opacity: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: calc(var(--cellSize) * 0.65);
+	font-weight: 900;
+}
+
+.cell.danger {
+	animation: danger 1s infinite;
+}
+
+.cell.bloody::after {
+	animation: bloody 1.5s ease-in-out;
+	animation-iteration-count: 1;
+	animation-fill-mode: both;
+	display: block;
+	content: " ";
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.cell.bloody:not(.movementPath):not(.hit)::after {
+	background: var(--red-dim);
+}
+
+.cell.hit {
+	animation: hitFloor 0.6s linear;
+}
+
+.cell.has_wall_left {
+	border-left: 2px solid var(--fg4);
+}
+
+.cell.has_wall_right {
+	border-right: 2px solid var(--fg4);
+}
+
+.cell.has_wall_top {
+	border-top: 2px solid var(--fg4);
+}
+
+.cell.has_wall_bottom {
+	border-bottom: 2px solid var(--fg4);
+}
+
+.cell.seen {
+	opacity: 0.3;
+}
+
+.cell.seen:hover {
+	outline: 2px solid var(--fg);
+	outline-offset: -2px;
+	background: var(--green);
+}
+
+.cell.movementPath {
+	background: var(--green-dim);
+}
+
+.cell.movementPath.blocked {
+	background: var(--yellow-dim);
+}
+
+.cell.visible {
+	opacity: 1;
+}
+
+.wall {
+	outline: 0.5px solid color(from var(--bg1) srgb r g b / 0.5);
+	outline-offset: -1px;
+	background: linear-gradient(
+		0deg,
+		color(from var(--bg3) srgb r g b / 0.5) 0%,
+		color(from var(--bg1) srgb r g b / 0.25) 50%
+	);
+	position: absolute;
+	width: var(--cellSize);
+	height: var(--wallHeight);
+	transform-origin: 0% 100%;
+	transition: opacity 0.5s ease;
+}
+
+.wall_top {
+	top: 0px;
+	left: 0px;
+	transform: translateY(-101%) translateX(-1%) rotateX(-90deg);
+}
+
+.wall_bottom {
+	bottom: 0px;
+	left: 0px;
+	transform: translateY(2.5%) rotateX(-90deg);
+	opacity: var(--frontWallOpacity);
+}
+
+.wall_left {
+	bottom: 0px;
+	left: 0px;
+	transform: translateX(-5%) translateY(-0.5px) rotateX(-90deg) rotateY(90deg);
+}
+
+.wall_right {
+	bottom: 0px;
+	right: 0px;
+	transform: translateX(105%) translateY(2.5%) rotateX(-90deg) rotateY(90deg);
+}
+
+/* Animation */
+@keyframes pending {
+	0% {
+		fill-opacity: 0.4;
+	}
+	50% {
+		fill-opacity: 0.6;
+	}
+	100% {
+		fill-opacity: 0.4;
+	}
+}
+
+@keyframes hitFloor {
+	0% {
+		background: var(--fg1);
+	}
+	10% {
+		background: var(--orange);
+	}
+	100% {
+		background: var(--fg1);
+	}
+}
+
+@keyframes danger {
+	0% {
+		border: 2px solid var(--red);
+	}
+	50% {
+		border: 2px solid var(--orange);
+	}
+	100% {
+		border: 2px solid var(--red);
+	}
+}
+
+@keyframes bloody {
+	0% {
+		opacity: 0;
+		transform: scale(0);
+		border-radius: 50%;
+	}
+	50% {
+		opacity: 0.2;
+	}
+	100% {
+		opacity: 0.15;
+		transform: scale(100%);
+		border-radius: 0;
+	}
+}
+
+@keyframes gotHit {
+	0% {
+		transform: scale(100%);
+	}
+	30% {
+		transform: scale(60%);
+	}
+	100% {
+		transform: scale(100%);
+	}
+}
+
+@keyframes down {
+	25% {
+		opacity: 1;
+	}
+
+	75% {
+		opacity: 0.75;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes action {
+	0% {
+		opacity: 0;
+		transform: translateY(50%);
+	}
+
+	6% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	94% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	100% {
+		opacity: 0;
+		transform: translateY(-50%);
+	}
+
+}
