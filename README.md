@@ -2,6 +2,8 @@
 
 Oh Dae-su, Matt Murdock, Repo Remy, Neo, John Preston... They all have that moment where they're at one end of a long hallway, their destination is at the other end, and there's a whole lot of enemies between them and that destination. Now it's your turn, presented in cinematic 2.39:1 aspect ratio.
 
+[Play on Itch.io](https://braininabowl.itch.io/corridor-fight-scene)
+
 This game was made in 7 days for 7DRL 2026. While it's based on the code for Piss and Vinegar and shares a lot of the design, almost every feature was rebuilt for this project.
 
 ### Controls
@@ -22,7 +24,7 @@ The game has a 2d grid mode, and a fancy dynamic 3d mode. By default it uses the
 
 ### Credits
 - All mistakes, code, and design by Frans van Bellen
-- Green room music by Tallbeard Studios, edited by Nicky Jupiter.
+- Green room music by [Tallbeard Studios](https://tallbeard.itch.io/music-loop-bundle), edited by [Nicky Jupiter](https://itch.io/profile/nickijupiter).
 - Fight music by Frans van Bellen
 - Font is JetBrains Mono by Philipp Nurullin /JetBrains
 - Color scheme is Gruvbox by Pavel Pertsev
