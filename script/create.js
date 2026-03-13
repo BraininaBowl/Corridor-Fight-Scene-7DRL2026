@@ -405,7 +405,7 @@ function addActor(x, y, type) {
 		let endX = actor.pos.x;
 		let endY = actor.pos.y;
 		let escape = false;
-		let lastCell = new Object();
+		let lastCell = map.readMap(actor.pos.x, actor.pos.y);
 		actor.actorElement.classList.add("fling");
 		path.forEach((step, index) => {
 			let cell = map.readMap(step[0], step[1]);
