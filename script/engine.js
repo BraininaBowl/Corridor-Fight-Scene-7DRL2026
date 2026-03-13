@@ -258,7 +258,7 @@ function deathScreen() {
 		actor = new Object();
 		actor.hp = actor.maxHp;
 		actor.energy = actor.maxEnergy;
-		actor.equipment.length = 0;
+		actor.equipment = new Array();
 		actor = addActor(map.entrance.x, map.entrance.y, "player");
 		nextLevel();
 	};
@@ -317,7 +317,7 @@ function runCachedActions() {
 						clearCachedAttackCell(cellElement, action.id);
 						if (cell.contents.occupant && cell.contents.occupant != action.source) {
 							cell.contents.occupant.getHit(action.damage);
-							if ((action.piercing = false)) {
+							if ((action.piercing == false)) {
 								resume = false;
 							}
 						}
@@ -404,7 +404,7 @@ function enemyTurn() {
 				if (plannedX == actor.awareX && plannedY == actor.awareY) {
 					escape = true;
 				} else {
-					actor.addMovementToPath(actor.awareX, actor.awareX);
+					actor.addMovementToPath(actor.awareX, actor.awareY);
 					updatePlannedCoords();
 					updatedPos = true;
 					escape = false;

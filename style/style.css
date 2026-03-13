@@ -448,6 +448,7 @@ body * {
 	justify-content: center;
 	font-size: calc(var(--cellSize) * 0.65);
 	font-weight: 900;
+	cursor: pointer;
 }
 
 .cell.danger {

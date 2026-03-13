@@ -312,7 +312,7 @@ function addActor(x, y, type) {
 		lastUniqueId++;
 		action.id = "cachedAction" + lastUniqueId;
 		action.type = "areaAttack";
-		action.damage = actor.activeAttack.damage;
+		action.damage = actor.activeAttack.damage();
 		action.path = newPath;
 		action.source = actor;
 		action.target = target;
@@ -400,7 +400,7 @@ function addActor(x, y, type) {
 			}
 		}
 	};
-	actor.fling = function (x, y, source = player) {
+	actor.fling = function (x, y, source) {
 		const path = bresenham([actor.pos.x, actor.pos.y], [x, y]);
 		let endX = actor.pos.x;
 		let endY = actor.pos.y;
@@ -422,25 +422,23 @@ function addActor(x, y, type) {
 					endY = newTarget.y;
 				}
 				actor.move(endX, endY);
-			} else if (cell.occupant) {
-				if (cell.occupant != source) {
-					escape = true;
-					endX = step[0];
-					endY = step[1];
-					actor.move(endX, endY);
-					actor.getHit(2);
-					cell.occupant.getHit(1);
-
-					if (actor.pos.x < cell.occupant.pos.x) {
-						cell.occupant.fling(actor.pos.x + 2, actor.pos.y, actor);
-					} else if (actor.pos.x > cell.occupant.pos.x) {
-						cell.occupant.fling(actor.pos.x - 2, actor.pos.y, actor);
-					} else if (actor.pos.y < cell.occupant.pos.y) {
-						cell.occupant.fling(actor.pos.x, actor.pos.y + 2, actor);
-					} else if (actor.pos.y > cell.occupant.pos.y) {
-						cell.occupant.fling(actor.pos.x, actor.pos.y - 2, actor);
-					}
+			} else if (cell.contents.occupant && cell.contents.occupant != source && cell.contents.occupant != actor) {
+				escape = true;
+				endX = step[0];
+				endY = step[1];
+				const collisionActor = cell.contents.occupant
+				if (actor.pos.x < collisionActor.pos.x) {
+					collisionActor.fling(collisionActor.pos.x + 2, collisionActor.pos.y, actor);
+				} else if (actor.pos.x > collisionActor.pos.x) {
+					collisionActor.fling(collisionActor.pos.x - 2, collisionActor.pos.y, actor);
+				} else if (actor.pos.y < collisionActor.pos.y) {
+					collisionActor.fling(collisionActor.pos.x, collisionActor.pos.y + 2, actor);
+				} else if (actor.pos.y > collisionActor.pos.y) {
+					collisionActor.fling(collisionActor.pos.x, collisionActor.pos.y - 2, actor);
 				}
+				actor.getHit(2);
+				collisionActor.getHit(1);
+				actor.move(endX, endY);
 			} else if (escape == false) {
 				endX = step[0];
 				endY = step[1];
@@ -583,15 +581,15 @@ function addActor(x, y, type) {
 		if (
 			actor.type != "player" &&
 			player.equipment.length > 0 &&
-			player.equipment.id == "hammer" &&
-			getRandomInt(2) < 2
+			player.equipment[0].id == "hammer" &&
+			getRandomInt(3) < 2
 		) {
 			actor.skipTurn();
 		}
 		document.getElementById(actor.pos.x + "_" + actor.pos.y).classList.add("bloody");
 		if (actor.hp <= 0) {
 			if (actor.type == "player") {
-				setTimeout(deathScreen(), 250)
+				setTimeout(deathScreen(), 250);
 			} else {
 				actor.ai = false;
 				map.writeMap(actor.pos.x, actor.pos.y, { occupant: undefined });
